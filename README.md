@@ -6,6 +6,8 @@ Multi-module Go repository providing production-ready implementations of harmoni
 interfaces. Each directory is an independent Go module — pick what you need, pull
 only its dependencies.
 
+> Inspired by [go-kit/kit](https://github.com/go-kit/kit)
+
 ## Modules
 
 ### Transport
