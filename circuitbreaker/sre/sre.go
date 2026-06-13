@@ -96,6 +96,14 @@ func (cb *CircuitBreaker[Req, Resp]) record(success bool) {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 
+	if success && cb.state == circuitbreaker.StateHalfOpen {
+		// Successful request in half-open resets the breaker.
+		cb.results = cb.results[:0]
+		cb.idx = 0
+		cb.state = circuitbreaker.StateClosed
+		return
+	}
+
 	if len(cb.results) < cb.config.WindowSize {
 		cb.results = append(cb.results, success)
 	} else {
