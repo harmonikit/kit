@@ -15,6 +15,8 @@ package echo
 import (
 	"context"
 
+	"github.com/labstack/echo/v4"
+
 	harmoniendpoint "github.com/harmonikit/harmoni/endpoint"
 )
 
