@@ -15,8 +15,8 @@ package fiber
 import (
 	"context"
 
-	harmoniendpoint "github.com/harmonikit/harmoni/endpoint"
 	"github.com/gofiber/fiber/v3"
+	harmoniendpoint "github.com/harmonikit/harmoni/endpoint"
 )
 
 // DecodeRequestFunc decodes a Fiber request into a domain request.

@@ -9,12 +9,12 @@ import (
 
 // Server is an HTTP transport server. It wraps an endpoint and serves it over HTTP.
 type Server[Req, Resp any] struct {
-	server        *http.Server
-	endpoint      endpoint.Endpoint[Req, Resp]
-	dec           DecodeRequestFunc[Req]
-	enc           EncodeResponseFunc[Resp]
-	encError      EncodeErrorFunc
-	before        []BeforeFunc
+	server   *http.Server
+	endpoint endpoint.Endpoint[Req, Resp]
+	dec      DecodeRequestFunc[Req]
+	enc      EncodeResponseFunc[Resp]
+	encError EncodeErrorFunc
+	before   []BeforeFunc
 }
 
 // BeforeFunc is a hook executed before each request. If it returns a non-nil
@@ -36,7 +36,7 @@ func WithBefore[Req, Resp any](fn BeforeFunc) ServerOption[Req, Resp] {
 }
 
 // defaultErrorEncoder writes a 500 status with the error message.
-func defaultErrorEncoder(ctx context.Context, w http.ResponseWriter, err error) {
+func defaultErrorEncoder(_ context.Context, w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
 
@@ -91,6 +91,7 @@ func (s *Server[Req, Resp]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // ListenAndServe starts the HTTP server on the given address.
 func (s *Server[Req, Resp]) ListenAndServe(addr string) error {
+	//nolint:exhaustruct
 	s.server = &http.Server{
 		Addr:    addr,
 		Handler: s,

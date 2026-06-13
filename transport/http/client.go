@@ -13,11 +13,11 @@ import (
 
 // Client is an HTTP client that calls a remote endpoint.
 type Client[Req, Resp any] struct {
-	client  *http.Client
-	method  string
-	url     *url.URL
-	enc     EncodeRequestFunc[Req]
-	dec     DecodeResponseFunc[Resp]
+	client *http.Client
+	method string
+	url    *url.URL
+	enc    EncodeRequestFunc[Req]
+	dec    DecodeResponseFunc[Resp]
 }
 
 // EncodeRequestFunc encodes a domain request into an HTTP request body.

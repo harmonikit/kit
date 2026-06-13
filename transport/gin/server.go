@@ -15,8 +15,8 @@ package gin
 import (
 	"context"
 
-	harmoniendpoint "github.com/harmonikit/harmoni/endpoint"
 	"github.com/gin-gonic/gin"
+	harmoniendpoint "github.com/harmonikit/harmoni/endpoint"
 )
 
 // DecodeRequestFunc decodes a Gin request into a domain request.

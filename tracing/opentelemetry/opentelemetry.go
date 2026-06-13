@@ -51,10 +51,12 @@ type Span struct {
 	span trace.Span
 }
 
+// End completes the span.
 func (s *Span) End() {
 	s.span.End()
 }
 
+// SetAttributes sets key-value pairs on the span.
 func (s *Span) SetAttributes(attrs ...any) {
 	otelAttrs := make([]attribute.KeyValue, 0, len(attrs)/2)
 	for i := 0; i < len(attrs); i += 2 {
