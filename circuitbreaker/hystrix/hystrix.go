@@ -36,11 +36,11 @@ func DefaultConfig() Config {
 
 // CircuitBreaker is a Hystrix-style circuit breaker.
 type CircuitBreaker[Req, Resp any] struct {
-	config    Config
-	mu        sync.Mutex
-	failures  int
-	state     circuitbreaker.State
-	openedAt  time.Time
+	config   Config
+	mu       sync.Mutex
+	failures int
+	state    circuitbreaker.State
+	openedAt time.Time
 }
 
 // New returns a new Hystrix circuit breaker.
@@ -52,8 +52,11 @@ func New[Req, Resp any](cfg Config) *CircuitBreaker[Req, Resp] {
 		cfg.SleepWindow = 30 * time.Second
 	}
 	return &CircuitBreaker[Req, Resp]{
-		config: cfg,
-		state:  circuitbreaker.StateClosed,
+		config:   cfg,
+		mu:       sync.Mutex{},
+		failures: 0,
+		state:    circuitbreaker.StateClosed,
+		openedAt: time.Time{},
 	}
 }
 

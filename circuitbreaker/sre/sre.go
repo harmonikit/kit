@@ -19,12 +19,9 @@ var _ circuitbreaker.CircuitBreaker[int, int] = (*CircuitBreaker[int, int])(nil)
 
 // Config holds the SRE circuit breaker configuration.
 type Config struct {
-	// ErrorThreshold is the error ratio (0.0-1.0) at which the circuit opens.
 	ErrorThreshold float64
-	// WindowSize is the number of requests tracked in the sliding window.
-	WindowSize int
-	// SleepWindow is how long the circuit stays open before going half-open.
-	SleepWindow time.Duration
+	WindowSize     int
+	SleepWindow    time.Duration
 }
 
 // DefaultConfig returns a reasonable default configuration.
@@ -40,7 +37,7 @@ func DefaultConfig() Config {
 type CircuitBreaker[Req, Resp any] struct {
 	config   Config
 	mu       sync.Mutex
-	results  []bool // true = success, false = failure
+	results  []bool
 	idx      int
 	state    circuitbreaker.State
 	openedAt time.Time
@@ -58,9 +55,12 @@ func New[Req, Resp any](cfg Config) *CircuitBreaker[Req, Resp] {
 		cfg.SleepWindow = 30 * time.Second
 	}
 	return &CircuitBreaker[Req, Resp]{
-		config:  cfg,
-		results: make([]bool, 0, cfg.WindowSize),
-		state:   circuitbreaker.StateClosed,
+		config:   cfg,
+		mu:       sync.Mutex{},
+		results:  make([]bool, 0, cfg.WindowSize),
+		idx:      0,
+		state:    circuitbreaker.StateClosed,
+		openedAt: time.Time{},
 	}
 }
 
