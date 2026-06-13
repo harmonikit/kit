@@ -1,0 +1,56 @@
+# https://taskfile.dev
+# kit — multi-module orchestration.
+
+version: '3'
+
+vars:
+  # Discover all Go modules (directories with go.mod)
+  MODULES:
+    sh: find . -type f -name go.mod -not -path '*/.go/*' | sed 's|/go.mod||' | sort
+
+tasks:
+  # ── Per-module operations ─────────────────────────────────────────
+  build:all:
+    desc: Build all kit modules
+    cmds:
+      - for: { var: MODULES }
+        cmd: cd {{.ITEM}} && go build ./...
+
+  test:all:
+    desc: Run tests with race detector in all modules
+    cmds:
+      - for: { var: MODULES }
+        cmd: cd {{.ITEM}} && go test -race -count=1 -coverprofile=coverage.out ./...
+
+  coverage:all:
+    desc: Check coverage in all modules
+    cmds:
+      - for: { var: MODULES }
+        cmd: cd {{.ITEM}} && go test -race -count=1 -coverprofile=coverage.out ./... && go tool cover -func=coverage.out | grep total
+
+  lint:all:
+    desc: Lint all kit modules
+    cmds:
+      - for: { var: MODULES }
+        cmd: cd {{.ITEM}} && golangci-lint run ./...
+
+  tidy:all:
+    desc: Tidy all kit modules
+    cmds:
+      - for: { var: MODULES }
+        cmd: cd {{.ITEM}} && go mod tidy && go mod tidy -diff
+
+  fuzz:all:
+    desc: Run fuzz tests in all modules (30s each)
+    cmds:
+      - for: { var: MODULES }
+        cmd: cd {{.ITEM}} && go test -fuzz=. -fuzztime=30s ./...
+
+  # ── CI ────────────────────────────────────────────────────────────
+  ci:
+    desc: Full CI pipeline for all modules
+    cmds:
+      - task: lint:all
+      - task: test:all
+      - task: coverage:all
+      - task: tidy:all

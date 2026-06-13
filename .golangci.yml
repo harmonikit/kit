@@ -1,0 +1,80 @@
+# golangci-lint configuration for kit modules.
+# Shared config; each module inherits this via --config or symlink.
+
+version: "2"
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - staticcheck
+    - unused
+    - gofumpt
+    - goimports
+    - nilnil
+    - exhaustruct
+    - revive
+    - gocognit
+    - gocyclo
+    - misspell
+    - unconvert
+    - unparam
+    - prealloc
+    - bodyclose
+    - noctx
+
+  settings:
+    gocognit:
+      min-complexity: 25
+    gocyclo:
+      min-complexity: 15
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: empty-block
+        - name: error-naming
+        - name: error-return
+        - name: error-strings
+        - name: errorf
+        - name: exported
+          arguments:
+            - checkPrivateReceivers: true
+            - sayRepetitiveInsteadOfStutters: true
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: redefines-builtin-id
+        - name: superfluous-else
+        - name: time-naming
+        - name: unexported-return
+        - name: unreachable-code
+        - name: unused-parameter
+        - name: var-declaration
+        - name: var-naming
+
+  exclusions:
+    paths:
+      - vendor/
+      - _test.go
+    rules:
+      - path: _test.go
+        linters:
+          - exhaustruct
+          - gocognit
+          - gocyclo
+          - errcheck
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
