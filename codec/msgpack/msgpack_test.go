@@ -51,3 +51,12 @@ func TestCodec_RoundTrip(t *testing.T) {
 		t.Fatalf("got %d, want 42", val)
 	}
 }
+
+func TestCodec_Decode_Invalid(t *testing.T) {
+	codec := msgpack.NewCodec[int, int]()
+	input := strings.NewReader("not-json")
+	_, err := codec.Decode(context.Background(), input)
+	if err == nil {
+		t.Fatal("expected decode error for invalid data")
+	}
+}
