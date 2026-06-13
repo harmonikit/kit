@@ -22,7 +22,7 @@ func NewTracer[Req, Resp any]() *Tracer[Req, Resp] {
 
 // Start begins a new span.
 func (t *Tracer[Req, Resp]) Start(ctx context.Context, operationName string, _ Req) (context.Context, harmonitracing.Span) {
-	return ctx, &Span{name: operationName}
+	return ctx, &Span{name: operationName, finished: false, err: nil, attrs: nil}
 }
 
 // End completes the span.

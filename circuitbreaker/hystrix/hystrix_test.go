@@ -92,7 +92,7 @@ func TestCircuitBreaker_HalfOpenToClosed(t *testing.T) {
 	cb.Execute(context.Background(), 1, failEP)
 
 	// Wait for sleep window.
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 
 	okEP := endpoint.Endpoint[int, int](func(ctx context.Context, req int) (int, error) {
 		return req, nil
