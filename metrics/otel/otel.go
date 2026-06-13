@@ -19,21 +19,22 @@ var (
 )
 
 // Counter implements harmonimetric.Counter backed by an atomic float64.
-// This is a stub — production code should use an OTEL Float64Counter.
 type Counter struct {
-	val  atomic.Int64
-	lvs  []string
+	val atomic.Int64
+	lvs []string
 }
 
 // NewCounter returns a Counter.
 func NewCounter() *Counter {
-	return &Counter{}
+	return &Counter{val: atomic.Int64{}, lvs: nil}
 }
 
+// With returns a new Counter with the given label values.
 func (c *Counter) With(labelValues ...string) harmonimetric.Counter {
-	return &Counter{lvs: append(c.lvs, labelValues...)}
+	return &Counter{val: atomic.Int64{}, lvs: append(c.lvs, labelValues...)}
 }
 
+// Add increments the counter by delta.
 func (c *Counter) Add(delta float64) {
 	c.val.Add(int64(delta))
 }
@@ -45,23 +46,26 @@ func (c *Counter) Value() float64 {
 
 // Gauge implements harmonimetric.Gauge backed by an atomic float64.
 type Gauge struct {
-	val  atomic.Int64
-	lvs  []string
+	val atomic.Int64
+	lvs []string
 }
 
 // NewGauge returns a Gauge.
 func NewGauge() *Gauge {
-	return &Gauge{}
+	return &Gauge{val: atomic.Int64{}, lvs: nil}
 }
 
+// With returns a new Gauge with the given label values.
 func (g *Gauge) With(labelValues ...string) harmonimetric.Gauge {
-	return &Gauge{lvs: append(g.lvs, labelValues...)}
+	return &Gauge{val: atomic.Int64{}, lvs: append(g.lvs, labelValues...)}
 }
 
+// Set sets the gauge to an absolute value.
 func (g *Gauge) Set(value float64) {
 	g.val.Store(int64(value))
 }
 
+// Add increments or decrements the gauge by delta.
 func (g *Gauge) Add(delta float64) {
 	g.val.Add(int64(delta))
 }
@@ -79,13 +83,15 @@ type Histogram struct {
 
 // NewHistogram returns a Histogram.
 func NewHistogram() *Histogram {
-	return &Histogram{}
+	return &Histogram{vals: nil, lvs: nil}
 }
 
+// With returns a new Histogram with the given label values.
 func (h *Histogram) With(labelValues ...string) harmonimetric.Histogram {
-	return &Histogram{lvs: append(h.lvs, labelValues...)}
+	return &Histogram{vals: nil, lvs: append(h.lvs, labelValues...)}
 }
 
+// Observe records a value in the histogram.
 func (h *Histogram) Observe(value float64) {
 	h.vals = append(h.vals, value)
 }

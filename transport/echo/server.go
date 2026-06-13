@@ -16,7 +16,6 @@ import (
 	"context"
 
 	harmoniendpoint "github.com/harmonikit/harmoni/endpoint"
-	"github.com/labstack/echo/v4"
 )
 
 // DecodeRequestFunc decodes an Echo request into a domain request.
@@ -45,7 +44,7 @@ func WithErrorEncoder[Req, Resp any](fn EncodeErrorFunc) ServerOption[Req, Resp]
 }
 
 // defaultErrorEncoder returns a 500 status with the error message via Echo.
-func defaultErrorEncoder(ctx context.Context, c echo.Context, err error) error {
+func defaultErrorEncoder(_ context.Context, c echo.Context, err error) error {
 	return c.String(500, err.Error())
 }
 

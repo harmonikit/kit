@@ -81,7 +81,7 @@ func (c *Client[Req, Resp]) Endpoint() harmoniendpoint.Endpoint[Req, Resp] {
 			var zero Resp
 			return zero, fmt.Errorf("do request: %w", err)
 		}
-		defer httpResp.Body.Close()
+		defer func() { _ = httpResp.Body.Close() }()
 
 		if httpResp.StatusCode < 200 || httpResp.StatusCode >= 300 {
 			// Read body for error context.

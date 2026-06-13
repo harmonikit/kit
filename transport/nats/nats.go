@@ -56,7 +56,7 @@ func (s *Server[Req, Resp]) HandleMsg(ctx context.Context, data []byte) ([]byte,
 	return s.enc(ctx, resp)
 }
 
-// Subscription details.
+// Subject returns the NATS subject this server handles.
 func (s *Server[Req, Resp]) Subject() string { return s.subject }
 
 // Client wraps NATS request-reply as a typed harmoni endpoint.

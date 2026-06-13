@@ -45,7 +45,7 @@ func WithErrorEncoder[Req, Resp any](fn EncodeErrorFunc) ServerOption[Req, Resp]
 }
 
 // defaultErrorEncoder returns a 500 status with the error message.
-func defaultErrorEncoder(ctx context.Context, c fiber.Ctx, err error) error {
+func defaultErrorEncoder(_ context.Context, c fiber.Ctx, err error) error {
 	return c.Status(500).SendString(err.Error())
 }
 

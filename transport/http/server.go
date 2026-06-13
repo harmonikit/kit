@@ -49,10 +49,12 @@ func NewServer[Req, Resp any](
 	opts ...ServerOption[Req, Resp],
 ) *Server[Req, Resp] {
 	s := &Server[Req, Resp]{
+		server:   nil,
 		endpoint: ep,
 		dec:      dec,
 		enc:      enc,
 		encError: defaultErrorEncoder,
+		before:   nil,
 	}
 	for _, opt := range opts {
 		opt(s)

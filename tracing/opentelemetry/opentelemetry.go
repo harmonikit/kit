@@ -27,13 +27,13 @@ func NewTracer[Req, Resp any](name string, opts ...trace.TracerOption) *Tracer[R
 }
 
 // Start begins a new span and returns the updated context.
-func (t *Tracer[Req, Resp]) Start(ctx context.Context, operationName string, req Req) (context.Context, harmonitracing.Span) {
+func (t *Tracer[Req, Resp]) Start(ctx context.Context, operationName string, _ Req) (context.Context, harmonitracing.Span) {
 	ctx, sp := t.tracer.Start(ctx, operationName)
 	return ctx, &Span{span: sp}
 }
 
 // End completes the span, recording the response and error.
-func (t *Tracer[Req, Resp]) End(ctx context.Context, span harmonitracing.Span, resp Resp, err error) {
+func (t *Tracer[Req, Resp]) End(_ context.Context, span harmonitracing.Span, resp Resp, err error) {
 	sp, ok := span.(*Span)
 	if !ok {
 		return
