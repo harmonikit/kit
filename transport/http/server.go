@@ -36,8 +36,22 @@ func WithBefore[Req, Resp any](fn BeforeFunc) ServerOption[Req, Resp] {
 }
 
 // defaultErrorEncoder writes a 500 status with the error message.
+// For status codes that must not have a body (1xx, 204, 304), the body
+// is omitted as required by RFC 7230.
 func defaultErrorEncoder(_ context.Context, w http.ResponseWriter, err error) {
-	http.Error(w, err.Error(), http.StatusInternalServerError)
+	code := http.StatusInternalServerError
+	if !allowsBody(code) {
+		w.WriteHeader(code)
+		return
+	}
+	http.Error(w, err.Error(), code)
+}
+
+// allowsBody reports whether the HTTP status code permits a response body.
+// 1xx informational codes, 204 No Content, and 304 Not Modified must not
+// include a body per RFC 7230.
+func allowsBody(code int) bool {
+	return code >= 200 && code != http.StatusNoContent && code != http.StatusNotModified
 }
 
 // NewServer creates an HTTP handler from an endpoint, request decoder, and
@@ -66,6 +80,9 @@ func NewServer[Req, Resp any](
 func (s *Server[Req, Resp]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	// Wrap to prevent body on no-body status codes (RFC 7230).
+	rw := &recordsStatus{ResponseWriter: w}
+
 	// Run before hooks.
 	for _, fn := range s.before {
 		ctx = fn(ctx, r)
@@ -73,20 +90,49 @@ func (s *Server[Req, Resp]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	req, err := s.dec(ctx, r)
 	if err != nil {
-		s.encError(ctx, w, err)
+		s.encError(ctx, rw, err)
 		return
 	}
 
 	resp, err := s.endpoint(ctx, req)
 	if err != nil {
-		s.encError(ctx, w, err)
+		s.encError(ctx, rw, err)
 		return
 	}
 
-	if err := s.enc(ctx, w, resp); err != nil {
-		s.encError(ctx, w, err)
+	if err := s.enc(ctx, rw, resp); err != nil {
+		s.encError(ctx, rw, err)
 		return
 	}
+}
+
+// recordsStatus wraps http.ResponseWriter to capture the status code.
+type recordsStatus struct {
+	http.ResponseWriter
+	wroteHeader bool
+	status      int
+}
+
+func (r *recordsStatus) WriteHeader(code int) {
+	if !r.wroteHeader {
+		r.status = code
+		r.wroteHeader = true
+		if !allowsBody(code) {
+			r.ResponseWriter.WriteHeader(code)
+			return
+		}
+	}
+	r.ResponseWriter.WriteHeader(code)
+}
+
+func (r *recordsStatus) Write(b []byte) (int, error) {
+	if !r.wroteHeader {
+		r.WriteHeader(http.StatusOK)
+	}
+	if !allowsBody(r.status) {
+		return len(b), nil // discard body for no-body status codes
+	}
+	return r.ResponseWriter.Write(b)
 }
 
 // ListenAndServe starts the HTTP server on the given address.
