@@ -26,16 +26,20 @@ type Registrar struct {
 
 // NewRegistrar returns a Registrar.
 func NewRegistrar() *Registrar {
-	return &Registrar{}
+	return &Registrar{mu: sync.Mutex{}, services: nil}
 }
 
 // Register adds the service instance.
 func (r *Registrar) Register(_ context.Context) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return nil
 }
 
 // Deregister removes the service instance.
 func (r *Registrar) Deregister(_ context.Context) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return nil
 }
 
@@ -65,11 +69,15 @@ type Instancer struct {
 
 // NewInstancer returns an Instancer with the given initial instances.
 func NewInstancer(instances ...string) *Instancer {
-	return &Instancer{instances: instances}
+	return &Instancer{
+		mu:        sync.Mutex{},
+		instances: instances,
+		subs:      nil,
+	}
 }
 
 // Discover returns the current instances.
-func (i *Instancer) Discover(ctx context.Context) ([]string, error) {
+func (i *Instancer) Discover(_ context.Context) ([]string, error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	result := make([]string, len(i.instances))

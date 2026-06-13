@@ -22,7 +22,7 @@ type Counter struct {
 
 // NewCounter returns a Counter backed by a Prometheus CounterVec.
 func NewCounter(cv *prom.CounterVec) *Counter {
-	return &Counter{cv: cv}
+	return &Counter{cv: cv, lvs: nil}
 }
 
 func (c *Counter) With(labelValues ...string) harmonimetric.Counter {
@@ -45,7 +45,7 @@ type Gauge struct {
 
 // NewGauge returns a Gauge backed by a Prometheus GaugeVec.
 func NewGauge(gv *prom.GaugeVec) *Gauge {
-	return &Gauge{gv: gv}
+	return &Gauge{gv: gv, lvs: nil}
 }
 
 func (g *Gauge) With(labelValues ...string) harmonimetric.Gauge {
@@ -76,7 +76,7 @@ type Histogram struct {
 
 // NewHistogram returns a Histogram backed by a Prometheus HistogramVec.
 func NewHistogram(hv *prom.HistogramVec) *Histogram {
-	return &Histogram{hv: hv}
+	return &Histogram{hv: hv, lvs: nil}
 }
 
 func (h *Histogram) With(labelValues ...string) harmonimetric.Histogram {

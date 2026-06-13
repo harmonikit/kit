@@ -29,16 +29,8 @@ func (l *Logger) Log(level harmonilog.Level, msg string, keysAndValues ...any) {
 
 // With returns a new Logger with additional context.
 func (l *Logger) With(keysAndValues ...any) harmonilog.Logger {
-	newLogger := &logrus.Logger{
-		Out:       l.logger.Out,
-		Formatter: l.logger.Formatter,
-		Hooks:     l.logger.Hooks,
-		Level:     l.logger.Level,
-		ExitFunc:  l.logger.ExitFunc,
-	}
-	// Add context as persistent fields via a new entry.
+	// Derive a new logrus.Logger via an entry to carry persistent fields.
 	entry := l.logger.WithFields(toLogrusFields(keysAndValues))
-	newLogger.Formatter = entry.Logger.Formatter
 	return &entryLogger{entry: entry, level: l.level}
 }
 
@@ -48,7 +40,8 @@ type entryLogger struct {
 	level logrus.Level
 }
 
-func (el *entryLogger) Log(level harmonilog.Level, msg string, keysAndValues ...any) {
+// Log emits a log message at the given level.
+func (el *entryLogger) Log(level harmonilog.Level, msg string, _ ...any) {
 	lvl := toLogrusLevel(level)
 	if lvl > el.level {
 		return
@@ -56,6 +49,7 @@ func (el *entryLogger) Log(level harmonilog.Level, msg string, keysAndValues ...
 	el.entry.Log(lvl, msg)
 }
 
+// With returns a new entryLogger with additional context.
 func (el *entryLogger) With(keysAndValues ...any) harmonilog.Logger {
 	return &entryLogger{
 		entry: el.entry.WithFields(toLogrusFields(keysAndValues)),

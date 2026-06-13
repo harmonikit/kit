@@ -26,6 +26,7 @@ type Limiter struct {
 func New(rate float64, burst int) *Limiter {
 	burstf := float64(burst)
 	return &Limiter{
+		mu:       sync.Mutex{},
 		rate:     rate,
 		burst:    burstf,
 		tokens:   burstf,
@@ -62,8 +63,6 @@ func (l *Limiter) SetRate(rate float64) {
 }
 
 // Middleware returns an endpoint middleware that rate-limits requests.
-// When the limiter denies a request, the endpoint is not called and an
-// error is returned.
 func Middleware[Req, Resp any](limiter *Limiter) endpoint.Middleware[Req, Resp] {
 	return func(next endpoint.Endpoint[Req, Resp]) endpoint.Endpoint[Req, Resp] {
 		return func(ctx context.Context, req Req) (Resp, error) {

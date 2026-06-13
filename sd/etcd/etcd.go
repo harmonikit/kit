@@ -26,14 +26,20 @@ type Registrar struct {
 
 // NewRegistrar returns an Etcd Registrar.
 func NewRegistrar() *Registrar {
-	return &Registrar{}
+	return &Registrar{mu: sync.Mutex{}, services: nil}
 }
 
+// Register adds the service instance.
 func (r *Registrar) Register(_ context.Context) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return nil
 }
 
+// Deregister removes the service instance.
 func (r *Registrar) Deregister(_ context.Context) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return nil
 }
 
@@ -47,6 +53,7 @@ func NewDiscoverer(instances ...string) *Discoverer {
 	return &Discoverer{instances: instances}
 }
 
+// Discover returns the current set of instances.
 func (d *Discoverer) Discover(_ context.Context) ([]string, error) {
 	result := make([]string, len(d.instances))
 	copy(result, d.instances)
@@ -62,10 +69,15 @@ type Instancer struct {
 
 // NewInstancer returns an Instancer.
 func NewInstancer(instances ...string) *Instancer {
-	return &Instancer{instances: instances}
+	return &Instancer{
+		mu:        sync.Mutex{},
+		instances: instances,
+		subs:      nil,
+	}
 }
 
-func (i *Instancer) Discover(ctx context.Context) ([]string, error) {
+// Discover returns the current instances.
+func (i *Instancer) Discover(_ context.Context) ([]string, error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	result := make([]string, len(i.instances))
@@ -73,6 +85,7 @@ func (i *Instancer) Discover(ctx context.Context) ([]string, error) {
 	return result, nil
 }
 
+// Subscribe returns a channel notified on instance changes.
 func (i *Instancer) Subscribe() <-chan struct{} {
 	i.mu.Lock()
 	defer i.mu.Unlock()
@@ -81,10 +94,12 @@ func (i *Instancer) Subscribe() <-chan struct{} {
 	return ch
 }
 
+// Instances returns the current instances.
 func (i *Instancer) Instances() ([]string, error) {
 	return i.Discover(context.Background())
 }
 
+// Set updates the instance list and notifies subscribers.
 func (i *Instancer) Set(instances []string) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
