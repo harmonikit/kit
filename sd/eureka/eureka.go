@@ -28,8 +28,8 @@ func NewRegistrar() *Registrar {
 	return &Registrar{}
 }
 
-func (r *Registrar) Register(ctx context.Context) error   { return nil }
-func (r *Registrar) Deregister(ctx context.Context) error { return nil }
+func (r *Registrar) Register(_ context.Context) error   { return nil }
+func (r *Registrar) Deregister(_ context.Context) error { return nil }
 
 // Discoverer discovers services from Eureka.
 type Discoverer struct {
@@ -41,7 +41,7 @@ func NewDiscoverer(instances ...string) *Discoverer {
 	return &Discoverer{instances: instances}
 }
 
-func (d *Discoverer) Discover(ctx context.Context) ([]string, error) {
+func (d *Discoverer) Discover(_ context.Context) ([]string, error) {
 	result := make([]string, len(d.instances))
 	copy(result, d.instances)
 	return result, nil

@@ -26,7 +26,7 @@ func NewCodec[Req, Resp any]() *Codec[Req, Resp] {
 }
 
 // Decode reads bytes from r and unmarshals them using proto.Unmarshal.
-func (c *Codec[Req, Resp]) Decode(ctx context.Context, r io.Reader) (Req, error) {
+func (c *Codec[Req, Resp]) Decode(_ context.Context, r io.Reader) (Req, error) {
 	var req Req
 	data, err := io.ReadAll(r)
 	if err != nil {
@@ -45,7 +45,7 @@ func (c *Codec[Req, Resp]) Decode(ctx context.Context, r io.Reader) (Req, error)
 }
 
 // Encode marshals a response using proto.Marshal and writes it to w.
-func (c *Codec[Req, Resp]) Encode(ctx context.Context, w io.Writer, resp Resp) error {
+func (c *Codec[Req, Resp]) Encode(_ context.Context, w io.Writer, resp Resp) error {
 	msg, ok := any(&resp).(proto.Message)
 	if !ok {
 		return fmt.Errorf("response type %T does not implement proto.Message", resp)

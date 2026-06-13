@@ -20,7 +20,7 @@ func NewCodec[Req, Resp any]() *Codec[Req, Resp] {
 }
 
 // Decode reads JSON from r. Replace with msgpack in production.
-func (c *Codec[Req, Resp]) Decode(ctx context.Context, r io.Reader) (Req, error) {
+func (c *Codec[Req, Resp]) Decode(_ context.Context, r io.Reader) (Req, error) {
 	var req Req
 	if err := json.NewDecoder(r).Decode(&req); err != nil {
 		return req, err
@@ -29,6 +29,6 @@ func (c *Codec[Req, Resp]) Decode(ctx context.Context, r io.Reader) (Req, error)
 }
 
 // Encode writes JSON to w. Replace with msgpack in production.
-func (c *Codec[Req, Resp]) Encode(ctx context.Context, w io.Writer, resp Resp) error {
+func (c *Codec[Req, Resp]) Encode(_ context.Context, w io.Writer, resp Resp) error {
 	return json.NewEncoder(w).Encode(resp)
 }

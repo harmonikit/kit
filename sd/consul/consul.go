@@ -30,12 +30,12 @@ func NewRegistrar() *Registrar {
 }
 
 // Register adds the service instance.
-func (r *Registrar) Register(ctx context.Context) error {
+func (r *Registrar) Register(_ context.Context) error {
 	return nil
 }
 
 // Deregister removes the service instance.
-func (r *Registrar) Deregister(ctx context.Context) error {
+func (r *Registrar) Deregister(_ context.Context) error {
 	return nil
 }
 
@@ -50,7 +50,7 @@ func NewDiscoverer(instances ...string) *Discoverer {
 }
 
 // Discover returns the current set of instances.
-func (d *Discoverer) Discover(ctx context.Context) ([]string, error) {
+func (d *Discoverer) Discover(_ context.Context) ([]string, error) {
 	result := make([]string, len(d.instances))
 	copy(result, d.instances)
 	return result, nil
