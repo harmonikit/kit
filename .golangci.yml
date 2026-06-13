@@ -6,20 +6,15 @@ version: "2"
 linters:
   enable:
     - errcheck
-    - gosimple
     - govet
     - staticcheck
     - unused
-    - gofumpt
-    - goimports
     - nilnil
     - exhaustruct
     - revive
     - gocognit
     - gocyclo
     - misspell
-    - unconvert
-    - unparam
     - prealloc
     - bodyclose
     - noctx
@@ -42,8 +37,8 @@ linters:
         - name: errorf
         - name: exported
           arguments:
-            - checkPrivateReceivers: true
-            - sayRepetitiveInsteadOfStutters: true
+            - check-private-receivers
+            - say-repetitive-instead-of-stutters
         - name: increment-decrement
         - name: indent-error-flow
         - name: package-comments
